@@ -1,0 +1,754 @@
+
+**>>This is note from Ashis Thakur***************************************************
+http://extentreports.com/community/>>>>>(Important)
+//http://extentreports.com/docs/versions/3/java/#basic-example
+Pre-requisites to Generate Extent Reports:
+//Extent Report Jars (Version 2.41.2)
+//TestNG should be installed
+//extent-config.xml – It allows to configure HTML Report
+
+
+First#### ExtentReports Configuration
+For ExtentReports we need to follow some stander steps which are
+To generate ExtentReports follow the some stander steps
+
+1. You need to add a  "ReportsConfig.xml" file in your project
+==================================================This is the ReportConfig.xml==========================
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+	<configuration>
+		<!-- report theme -->
+		<!-- standard, dark -->
+		<theme>standard</theme>
+
+		<!-- document encoding -->
+		<!-- defaults to UTF-8 -->
+		<encoding>UTF-8</encoding>
+
+		<!-- protocol for script and stylesheets -->
+		<!-- defaults to https -->
+		<protocol>https</protocol>
+
+		<!-- title of the document -->
+		<documentTitle>Sample Automation Reports</documentTitle>
+
+		<!-- report name - displayed at top-nav -->
+		<reportName>Automation Report</reportName>
+
+		<!-- report headline - displayed at top-nav, after reportHeadline -->
+		<reportHeadline>Google Login Functionality</reportHeadline>
+
+		<!-- global date format override -->
+		<!-- defaults to yyyy-MM-dd -->
+		<dateFormat>yyyy-MM-dd</dateFormat>
+
+		<!-- global time format override -->
+		<!-- defaults to HH:mm:ss -->
+		<timeFormat>HH:mm:ss</timeFormat>
+
+		<!-- custom javascript -->
+		<scripts>
+            <![CDATA[
+                $(document).ready(function() {
+                    
+                });
+            ]]>
+		</scripts>
+
+		<!-- custom styles -->
+		<styles>
+            <![CDATA[
+                
+            ]]>
+		</styles>
+	</configuration>
+</extentreports>
+==================================================End of ReportConfig.xml================================
+
+How to add this file to the project?
+1.Right click on the project>>new>>file>>File name(ReportsConfig.xml)
+This file got configuration about Report.
+
+Second########
+
+You should have "ExtentManager.java" class in your project.
+
+
+=======================This is the class of ExtentManager=================================================================
+package com.qtpselenium.core.ddf.util;
+
+import java.io.File;
+import java.util.Date;
+
+import com.relevantcodes.extentreports.DisplayOrder;
+import com.relevantcodes.extentreports.ExtentReports;
+_________________________________________________________________________________________________________
+
+=========================================================================================================
+
+public class ExtentManager
+{       
+         //To learn ExtentReports class 
+        //http://extentreports.com/docs/versions/2/java/doc/com/relevantcodes/extentreports/ExtentReports.html
+
+	private static ExtentReports extent;
+	
+	
+	public static ExtentReports getInstance() 
+	{
+		if (extent == null) 
+		{       
+
+
+                        /*
+                           
+		         Date d = new Date();
+		         System.out.println(d);
+		         System.out.println(d.toString().replace(":", "_").replace(" ", "_"));
+                         Generating different report file in each run
+                        */
+
+			Date d=new Date();
+			String fileName=d.toString().replace(":", "_").replace(" ", "_")+".html";
+
+                        //Above two line related to time stamp. Every time you run the test it should produce a new file according to what time you run
+                        //This line>>extent = new ExtentReports("C:\\Users\\Mir\\Documents\\ThaqurNote\\Report\\report.html", true, DisplayOrder.NEWEST_FIRST);
+                        //produce only one file. If you run test more than one time. It will erase old report and replace with new report
+
+			extent = new ExtentReports("C:\\Users\\Mir\\Documents\\ThaqurNote\\Report\\"+fileName, true, DisplayOrder.NEWEST_FIRST);
+			//This is the file(above line) where ExtentReports will be save.
+			
+			
+                        //optional below line It is depricated
+			//extent.config().documentTitle("Automation Report").reportName("Regression").reportHeadline("");
+			
+			extent.loadConfig(new File(System.getProperty("user.dir")+"\\ReportsConfig.xml"));
+			//This is the line(above ) bridge between ExtentManager class and ReportsConfig.xml
+			
+			// optional
+			extent.addSystemInfo("Selenium Version", "3.141.59").addSystemInfo(
+					"Environment", "QA");
+		}
+		return extent;
+	}
+}
+
+
+=======================This is End of the class of ExtentManager=================================================================
+##Very important line>>extent.loadConfig(new File(System.getProperty("user.dir")+"\\ReportsConfig.xml"));
+this line should be change according to your ".xml" file. You need to provide exact path of "ReportsConfig.xml"
+file. This file under the "src/main/java">>>Create a new package here and name it "util" and Copy and past this
+file
+=========================================================================================================
+===============================How to add ScreenShot at the Report===========================================
+To add screenshot to the report I will make a method in base class(method#takeScreenShot()). It will take the screenshot
+and put in to report. But First let me say,I have an image in my computer and I want to add this picture to my report. The picture located>>
+>>"C:\Users\Mir\Documents\ThaqurNote\ExtentReport\picimage.png" How do I add this picture to my report.
+Take screenshot and add picture(embedded picture) are difference.
+
+//Add an existing screenShot to the testcase.
+//I have a picture which is saved to the below file
+//C:\\Users\\Mir\\Documents\\ThaqurNote\\ExtentReport\\picimage.png
+// This picture I am adding to this testC
+ test.log(LogStatus.FAIL, "ScreenShot-->>"+ test.addScreenCapture("C:\\Users\\Mir\\Documents\\ThaqurNote\\ExtentReport\\picimage.png"));
+
+
+package com.qtpselenium.core.ddf.testcases;
+
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+
+import com.qtpselenium.core.ddf.base.BaseTest;
+import com.relevantcodes.extentreports.LogStatus;
+
+public class DummyTestC extends BaseTest
+{   
+	                     
+	
+     @Test
+     public void testC()
+     {
+    	 test = report.startTest("DummyTestC");
+    	 test.log(LogStatus.INFO, "Starting DummyTestC");
+    	 test.log(LogStatus.FAIL, "Failed DummyTestC");
+    	 test.log(LogStatus.FAIL, "Adding existing picture to the report"+ test.addScreenCapture
+         ("C:\\Users\\Mir\\Documents\\ThaqurNote\\ExtentReport\\picimage.png"));
+     }
+     
+     @AfterMethod
+ 	public void quit()
+ 	{   
+ 		//This will generate the report. In order to generate report
+ 		//you have to add this two line. Its very important to know
+ 		report.endTest(test);
+ 		report.flush();
+ 	}
+}
+================================End of ExtentReports=====================================================
+
+=============Another simple way take a screenshot=====This is first approach====================================
+I know how to attached screenshot to the file. But I have  screenshot file with me. What I will do now,
+in my project I will create a new folder known as "screenshot">>>right click on project>>new>>Folder>>Folder name>>finish
+in this folder I will store all my screenshot which I take to help of webdriver code. All this screenshot will be taken 
+in the Base test class inside the takeScreenShot() method.
+
+
+
+
+package com.qtpselenium.core.ddf.base;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
+
+import com.qtpselenium.core.ddf.util.ExtentManager;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
+
+public class BaseTest {
+	public WebDriver driver;
+	public Properties prop;
+	public ExtentReports rep = ExtentManager.getInstance();
+	public ExtentTest test;
+
+	public void init(){
+		//init the prop file
+		if(prop==null){
+			prop=new Properties();
+			try {
+				FileInputStream fs = new FileInputStream(System.getProperty("user.dir")+"//src//test//resources//projectconfig.properties");
+				prop.load(fs);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void openBrowser(String bType){
+		
+		if(bType.equals("Mozilla"))
+			driver=new FirefoxDriver();
+		else if(bType.equals("Chrome")){
+			System.setProperty("webdriver.chrome.driver", prop.getProperty("chromedriver_exe"));
+			driver=new ChromeDriver();
+		}
+		else if (bType.equals("IE")){
+			System.setProperty("webdriver.chrome.driver", prop.getProperty("iedriver_exe"));
+			driver= new InternetExplorerDriver();
+		}
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().window().maximize();
+		
+	}
+
+	public void navigate(String urlKey){
+		driver.get(prop.getProperty(urlKey));
+	}
+	
+	public void click(String locatorKey){
+		getElement(locatorKey).click();
+	}
+	
+	public void type(String locatorKey,String data){
+		getElement(locatorKey).sendKeys(data);
+	}
+	// finding element and returning it
+	public WebElement getElement(String locatorKey){
+		WebElement e=null;
+		try{
+		if(locatorKey.endsWith("_id"))
+			e = driver.findElement(By.id(prop.getProperty(locatorKey)));
+		else if(locatorKey.endsWith("_name"))
+			e = driver.findElement(By.name(prop.getProperty(locatorKey)));
+		else if(locatorKey.endsWith("_xpath"))
+			e = driver.findElement(By.xpath(prop.getProperty(locatorKey)));
+		else{
+			reportFailure("Locator not correct - " + locatorKey);
+			Assert.fail("Locator not correct - " + locatorKey);
+		}
+		
+		}catch(Exception ex){
+			// fail the test and report the error
+			reportFailure(ex.getMessage());
+			ex.printStackTrace();
+			Assert.fail("Failed the test - "+ex.getMessage());
+		}
+		return e;
+	}
+	/***********************Validations***************************/
+	public boolean verifyTitle(){
+		return false;		
+	}
+	
+	public boolean isElementPresent(String locatorKey){
+		List<WebElement> elementList=null;
+		if(locatorKey.endsWith("_id"))
+			elementList = driver.findElements(By.id(prop.getProperty(locatorKey)));
+		else if(locatorKey.endsWith("_name"))
+			elementList = driver.findElements(By.name(prop.getProperty(locatorKey)));
+		else if(locatorKey.endsWith("_xpath"))
+			elementList = driver.findElements(By.xpath(prop.getProperty(locatorKey)));
+		else{
+			reportFailure("Locator not correct - " + locatorKey);
+			Assert.fail("Locator not correct - " + locatorKey);
+		}
+		
+		if(elementList.size()==0)
+			return false;	
+		else
+			return true;
+	}
+	
+	public boolean verifyText(String locatorKey,String expectedTextKey){
+		String actualText=getElement(locatorKey).getText().trim();
+		String expectedText=prop.getProperty(expectedTextKey);
+		if(actualText.equals(expectedText))
+			return true;
+		else 
+			return false;
+		
+	}
+	/*****************************Reporting********************************/
+	
+	public void reportPass(String msg){
+		test.log(LogStatus.PASS, msg);
+	}
+	
+	public void reportFailure(String msg){
+		test.log(LogStatus.FAIL, msg);
+		takeScreenShot();
+		Assert.fail(msg);
+	}
+	
+	public void takeScreenShot(){
+		// fileName of the screenshot
+		Date d=new Date();
+		String screenshotFile=d.toString().replace(":", "_").replace(" ", "_")+".png";
+		// store screenshot in that file
+		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+                
+                 //getScreenshotAs()-->Capture the screenshot and store it in the specified location.
+
+		try {
+			FileUtils.copyFile(scrFile, new File(System.getProperty("user.dir")+"//screenshots//"+screenshotFile));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//put screenshot file in reports
+		test.log(LogStatus.INFO,"Screenshot-> "+ test.addScreenCapture(System.getProperty("user.dir")+"//screenshots//"+screenshotFile));
+		
+	}
+	
+}
+
+
+-----------------------------Below Another class implements same concepts--------------------------------
+
+src/test/java
+package com.qtpselenium.core.ddf.base;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.annotations.Test;
+
+public class Ittadi 
+{
+   
+	@Test
+
+
+	public void captureScreenShot()
+	{   
+		System.setProperty("webdriver.chrome.driver", 
+				System.getProperty("user.dir")+"\\driver\\chromedriver.exe");
+		ChromeOptions ops = new ChromeOptions();	
+		ops.addArguments("--disable-notifications");
+		ops.addArguments("disable-infobars");
+		ops.addArguments("--start-maximized");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, 
+				System.getProperty("user.dir")+"\\log\\chrome.log");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
+		WebDriver driver;
+		driver = new ChromeDriver(ops);
+        driver.get("http://www.facebook.com");
+        driver.findElement(By.xpath("//*[@id=\"email\"]")).sendKeys("miraalmamunmail.com");
+        //After this line I want to take a screenshot. Taking screenshot in Selenium WebDriver
+        //We have a predefined interface known as TakesScreenshot(i). This is an interface in Selenium WebDriver
+        //So we cannot create an object from it. So what I will do, I will Typecasting it((TakesScreenshot)driver)
+        //and I will assign it to the ts variable which is TakesScreenshot type. See the below code(below line)
+        //Now this is work as object creation. On ts you can call all predefined methods thats belong to TakesScreenshot interface
+        // This line of code>ts.getScreenshotAs(OutputType.FILE)>return File type which is store in 
+        //This(getScreenshotAs()) method will asked you how you want this output. "OutputType.FILE"> This will capture the screenshot
+        //in term of file. This line(ts.getScreenshotAs(OutputType.FILE)) will take the screenshot and keep it in a memory or buffer
+        //
+		TakesScreenshot ts = (TakesScreenshot)driver;
+		File source = ts.getScreenshotAs(OutputType.FILE);
+		try 
+		{
+			FileUtils.copyFile(source, new File(System.getProperty("user.dir")+"\\ScreenShots\\facebook.png"));
+			/*
+			 * We can use above line or we can use>>FileUtils.copyFile(source, new File(".\\ScreenShots\\facebook2.png"));
+			 * Both line are same>>"." also indicate current working directory
+			 */
+			//The above line copy the srFile and load it to the current directory under ScreenShots Folder. The name of the file is 
+			//facebook.png. How to create ScreenShots Folder in the current working directory?
+			//Right click on the project>new>Folder>Folder name>ScreenShots>finish
+			//source = source file to destination file
+			//I will save all screenshot in folder "ScreenShots"
+			//The above line take two file arguments
+		} 
+		catch (Exception e) 
+		{
+
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		System.out.println("ScreenShot taken");
+		driver.quit();
+	}
+
+
+}
+
+Note:Below three lines will take the screenshot:
+                1.TakesScreenshot ts = (TakesScreenshot)driver;
+		2.File source = ts.getScreenshotAs(OutputType.FILE);
+                3.FileUtils.copyFile(source, new File(System.getProperty("user.dir")+"\\ScreenShots\\facebook.png"));
+
+If I write 10 scripts then I have to write above three lines 10 times.If you want to take 10 screenshot
+then you have to write above three lines 10 times. So we using same code over and over. For this reason we
+need to create a library that we can reuse the codes.How to create a library?>>>I will create a seperate Folder(Package)
+package name>library>create a class in it"utility"
+
+==================================================End first approach=====================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=========================================Second approach================================================ 
+src/main/java
+package library;
+
+import java.io.File;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+public class Utility 
+{
+    public static void capureScreenShot(WebDriver driver,String screenShotName)
+    {
+    	
+    	try 
+    	{               
+
+                        // Create refernce of TakesScreenshot
+			TakesScreenshot ts = (TakesScreenshot)driver;
+                        // Call method to capture screenshot
+			File source = ts.getScreenshotAs(OutputType.FILE);
+                       // Copy files to specific location where it will save all screenshot in our project home directory and
+			FileUtils.copyFile(source, new File(".\\ScreenShots\\"+screenShotName+".png"));
+			System.out.println("Screenshot taken");
+		} 
+    	catch (Exception e)
+    	{
+			System.out.println("Exception while taking screenshot"+e.getMessage());
+			e.printStackTrace();
+		} 
+    	
+	}
+
+    	
+    }
+
+
+
+---------------------------------------------------------------------------------------------------------
+// Create a package in eclipse
+src/test/java
+package com.qtpselenium.core.ddf.base;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.annotations.Test;
+
+import library.Utility;
+
+public class Ittadi3 
+{
+   
+	@Test
+
+
+	public void captureScreenShot()
+	{   
+		System.setProperty("webdriver.chrome.driver", 
+				System.getProperty("user.dir")+"\\driver\\chromedriver.exe");
+		ChromeOptions ops = new ChromeOptions();	
+		ops.addArguments("--disable-notifications");
+		ops.addArguments("disable-infobars");
+		ops.addArguments("--start-maximized");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, 
+				System.getProperty("user.dir")+"\\log\\chrome.log");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
+		WebDriver driver;
+		driver = new ChromeDriver(ops);
+		
+        driver.get("http://www.facebook.com");
+        Utility.capureScreenShot(driver, "BrowserStarted");
+        driver.findElement(By.xpath("//*[@id=\"email\"]")).sendKeys("miraalmamunmail.com");
+        Utility.capureScreenShot(driver, "TypeUserName");
+        driver.quit();
+	}
+
+
+}
+=====================================End second approach==================================================
+
+
+
+=============How to take screenshot of failed test cases in Selenium Webdriver===========================
+
+Generally, scripts fail in 2 situations.
+1-If script has some issue (some locator has been changed or application has some changes)- In this case, we need to 
+maintain our Selenium script.
+2-Due to application issue- In this case, we need to inform to respective point of contact (Manual Tester or Developer)
+
+How to Capture screenshot in selenium for failed test cases
+Previously I have covered a post on capture screenshot in Selenium so if you have not gone through the previos post then 
+I will highly recommend you to please go through the post and youtube as well.
+
+Today we will see something different How to capture a screenshot for failed test cases in Selenium Webdriver.
+
+Here I will be using two new topics which will help us to achieve the same.
+
+1-We will use ITestResult Interface which will provide us the test case execution status and test case name.
+
+Please refer official doc for ITestResult
+
+2- @AfterMethod is another annotation of TestNG which will execute after every test execution whether test case pass or
+fail @AfterMethod will always execute.
+
+Please refer official doc for @AfterMethod
+---------------------------------------------------------------------------------------------------------
+src/test/java
+// Create a package in eclipse
+package com.qtpselenium.core.ddf.base;
+// Import all classes and interface
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+
+import library.Utility;
+
+public class Ittadi4 
+{
+    
+	// Create Webdriver reference
+	WebDriver driver;
+	@Test
+
+
+	public void captureScreenShot()
+	{       
+                // Initiate Chrome browser
+		System.setProperty("webdriver.chrome.driver", 
+				System.getProperty("user.dir")+"\\driver\\chromedriver.exe");
+		ChromeOptions ops = new ChromeOptions();	
+		ops.addArguments("--disable-notifications");
+		ops.addArguments("disable-infobars");
+		ops.addArguments("--start-maximized");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, 
+				System.getProperty("user.dir")+"\\log\\chrome.log");
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
+		
+		driver = new ChromeDriver(ops);
+		
+        driver.get("http://www.facebook.com");
+        // Here we are forcefully passing wrong id so that it will fail our testcase
+        driver.findElement(By.xpath("//*[@id=\"emailaaaa\"]")).sendKeys("miraalmamunmail.com");
+        
+	}
+	
+
+
+        // It will execute after every test execution 
+	@AfterMethod
+	public void tearDown(ITestResult result)
+	{
+		
+		// Here will compare if test is failing then only it will enter into if condition
+		if(ITestResult.FAILURE==result.getStatus())
+		{       
+
+                        // result.getName() will return name of test case so that screenshot name will be same
+			Utility.capureScreenShot(driver, result.getName());
+                        
+
+		}
+		driver.quit();
+		
+		
+	}
+
+	
+	
+}
+============================================================================================================================
+==========================================================================================================================
+=================================================EXTENTREPORT====================================================================
+
+In this Framework we need to create Folder below--->
+
+1)ScreenShots-->All Failed testcases screenshots will be in it and we will
+attached this screenshot in the ExtentReport
+2)src\test\resources-->Source Folder. If there is not one,we need to create one.
+In it we will keep '.properties','.xml' Files
+----------------------------------------------------------------------------------
+In this Framework there will be a lot of files such as 1)ReportsConfig.xml
+2)pom.xml
+3).xlsx ....etc.
+------------------------------------------------------------------------------------
+Reqirements DDF
+
+Maven Project
+Read Data from XLS
+Implement tests and validations
+Reports - XSLT, Extent Reports
+Logging in reports
+Screenshots - putting in reports
+Run project with ANT/Maven/Eclipse
+Implement GRID - Parallel and reports/logs/screenshots
+Reusability
+Diff Env
+Integrate with Jenkins/Schedule tests
+Easy to change
+--------------------------------------------------------------------------------------
+Core DD Framework
+Create Maven Project
+Create Packages
+Create the dummy tests
+Introduced depency
+Make testng.xml for batch running
+Built the BaseTest and functions in base test- 
+Build validation func
+Build generic functions
+Build report generation functions
+Initiate the properties file
+Build a cerntralized/reusable function to extract objects
+Generate Reports and Logging in reports
+Put screenshots in reports
+Generating Different report file in each run
+Build Validation Functions
+Softassertions - Prevent test to stop in case of minor Failure
+Reading Data from XLS-Parameterizing tests
+Build the utility function for reading data
+Selectively/Optionally Run tests
+----------------------------------------------------------------------------------------
+==================================ExtentManager.java-->Inside util package-->Have to have
+
+-->
+
+   package com.qtpselenium.core.ddf.util2;
+
+import java.io.File;
+import java.util.Date;
+
+import com.relevantcodes.extentreports.DisplayOrder;
+import com.relevantcodes.extentreports.ExtentReports;
+
+public class ExtentManager
+{
+	private static ExtentReports extent;
+	
+	
+	public static ExtentReports getInstance() 
+	{
+		if (extent == null) 
+		{   
+			
+			//extent = new ExtentReports(".\\report.html", true, DisplayOrder.NEWEST_FIRST);
+			
+			Date d=new Date();
+			String fileName=d.toString().replace(":", "_").replace(" ", "_")+".html";
+			//--------------------------------Start-------------------------------------------
+			//The below line will create a file inside 'Report\\ExtentReports' We need to create
+			//this folder. We dont need to create the file,but we have to create folder
+			//We have to create 'ExtentReports' Folder
+			extent = new ExtentReports(".\\Report\\ExtentReports"+fileName, true, DisplayOrder.NEWEST_FIRST);
+			
+			//This is the file(above line) where ExtentReports will be save.
+		//------------------------------------------End----------------------------------------	
+		//-----------------------------------------Start----------------------------------------------------------	
+            //optional
+			//extent.config().documentTitle("Automation Report").reportName("Regression").reportHeadline("");
+		//-------------------------------------------End---------------------------------------------------------	
+			extent.loadConfig(new File(System.getProperty("user.dir")+"\\ReportsConfig.xml"));
+			//This is the line(above ) bridge between ExtentManager class and ReportsConfig.xml
+			//We have to keep '\\ReportsConfig.xml' file in the working directory
+			
+			// optional
+			extent.addSystemInfo("Selenium Version", "2.52.0").addSystemInfo(
+					"Environment", "QA");
+		}
+		return extent;
+	}
+}
+
+==================================End ExtentReport===============================================
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+1566443416187	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\Mir\\AppData\\Local\\Temp\\rust_mozprofile.4zoU5TMHePXb"
+1566443420111	Marionette	INFO	Listening on port 54322
+1566443420508	Marionette	WARN	TLS certificate errors will be ignored for this session
+1566443420546	Marionette	DEBUG	[6442450945] Frame script loaded
+1566443420548	Marionette	DEBUG	[6442450945] Frame script registered
+1566443420625	Marionette	DEBUG	[6442450945] Received DOM event beforeunload for about:blank
+1566443421829	Marionette	DEBUG	[6442450945] Received DOM event pagehide for about:blank
+1566443424489	Marionette	DEBUG	[6442450945] Received DOM event DOMContentLoaded for https://portfolio.rediff.com/portfolio-login
+1566443425619	Marionette	DEBUG	[6442450945] Received DOM event pageshow for https://portfolio.rediff.com/portfolio-login
+1566443425996	Marionette	DEBUG	[6442450945] Canceled page load listener because no navigation has been detected
+1566443426914	Marionette	DEBUG	[6442450945] Canceled page load listener because no navigation has been detected
+1566443462549	Marionette	INFO	Stopped listening on port 54322
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x4A000F,name=PHttpChannel::Msg___delete__) Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x560027,name=PNecko::Msg_RemoveRequestContext) Channel closing: too late to send/recv, messages will be lost
+
+[Child 3464, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3464, Chrome_ChildThread] WARNING: pipe erro[GPU 12696, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+

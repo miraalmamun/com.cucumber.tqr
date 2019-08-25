@@ -1,0 +1,10 @@
+Eclipse Plugin-http://cucumber.github.com/cucumber-eclipse/update-site
+
+
+start and end symbols ^ $
+passing values from scenario
+[a-zA-Z]{1,} - any number of alphabets  kahsjhd HJAHUAU  AHAHhshsjsjsh
+\\d+ - any number of digits  1  123  53333
+[a-zA-Z0-9]{1,} alpha numeric
+(.*) - list
+[^\"]* anything

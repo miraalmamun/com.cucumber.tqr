@@ -1,0 +1,448 @@
+   http://extentreports.com/community/(Important)
+
+
+  Pre-requisites to Generate Extent Reports:
+
+1.Java should be installed (Link to Install and setup Java )
+2.TestNG should be installed – Install TestNG
+3.Extent Report Jars (Version 2.41.2) – Download
+4.extent-config.xml – It allows to configure HTML Report
+    Steps To Generate Extent Reports:
+
+1.Firstly, create a TestNG project in eclipse
+2.Now download extent library files from the following link: http://extentreports.relevantcodes.com/
+3.Add the downloaded library files to your project
+4.Create a java class say ‘ExtentReportsClass’ and add the following code to it
+
+Code Explanation:
+
+i. Imported two classes ExtentReports and ExtentTest.
+
+ExtentReports: By using this class we set the path where our reports need to generate.
+ExtentTest: By using this class we could generate the logs in the report.
+
+ii. Took three methods with @Test annotation such as passTest, failTest and skipTest and a method startTest with @BeforeTest annotation and another method endReport with @AfterMethod annotation
+
+Here my intention is to generate a report with all the three types of results such as Pass, Fail and Skip.
+iii. Used object of ExtentReports class (i.e., extent) in the startReport method which was assigned to @BeforeTest annotation to generate the HTML report in the required path
+
+iv. Used object of ExtentTest class (i.e., logger) in the remaining methods to write logs in the report.
+
+v. Used ITestResult class in the @AfterMethod to describes the result of a test.
+
+Given clear explanation in the comments section with in the program itself. Please go through it to understand the flow.
+
+
+
+
+package softwareTestingMaterial;
+
+import java.io.File;
+
+import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
+
+public class ExtentReportsClass{
+	ExtentReports extent;
+	ExtentTest logger;
+	
+	
+	@BeforeTest
+	public void startReport(){
+		//ExtentReports(String filePath,Boolean replaceExisting) 
+		//filepath - path of the file, in .htm or .html format - path where your report needs to generate. 
+		//replaceExisting - Setting to overwrite (TRUE) the existing file or append to it
+		//True (default): the file will be replaced with brand new markup, and all existing data will be lost. Use this option to create a brand new report
+		//False: existing data will remain, new tests will be appended to the existing report. If the the supplied path does not exist, a new file will be created.
+		extent = new ExtentReports (System.getProperty("user.dir") +"/test-output/STMExtentReport.html", true);
+		//extent.addSystemInfo("Environment","Environment Name")
+		extent
+                .addSystemInfo("Host Name", "SoftwareTestingMaterial")
+                .addSystemInfo("Environment", "Automation Testing")
+                .addSystemInfo("User Name", "Rajkumar SM");
+                //loading the external xml file (i.e., extent-config.xml) which was placed under the base directory
+                //You could find the xml file below. Create xml file in your project and copy past the code mentioned below
+                extent.loadConfig(new File(System.getProperty("user.dir")+"\\extent-config.xml"));
+	}
+		
+	@Test
+	public void passTest(){
+		//extent.startTest("TestCaseName", "Description")
+		//TestCaseName – Name of the test
+		//Description – Description of the test
+		//Starting test
+		logger = extent.startTest("passTest");
+		Assert.assertTrue(true);
+		//To generate the log when the test case is passed
+		logger.log(LogStatus.PASS, "Test Case Passed is passTest");
+	}
+	
+	@Test
+	public void failTest(){
+		logger = extent.startTest("failTest");
+		Assert.assertTrue(false);
+		logger.log(LogStatus.PASS, "Test Case (failTest) Status is passed");
+	}
+	
+	@Test
+	public void skipTest(){
+		logger = extent.startTest("skipTest");
+		throw new SkipException("Skipping - This is not ready for testing ");
+	}
+	
+	@AfterMethod
+	public void getResult(ITestResult result){
+		if(result.getStatus() == ITestResult.FAILURE){
+			logger.log(LogStatus.FAIL, "Test Case Failed is "+result.getName());
+			logger.log(LogStatus.FAIL, "Test Case Failed is "+result.getThrowable());
+		}else if(result.getStatus() == ITestResult.SKIP){
+			logger.log(LogStatus.SKIP, "Test Case Skipped is "+result.getName());
+		}
+		// ending test
+		//endTest(logger) : It ends the current test and prepares to create HTML report
+		extent.endTest(logger);
+	}
+	@AfterTest
+	public void endReport(){
+		// writing everything to document
+		//flush() - to write or update test information to your report. 
+                extent.flush();
+                //Call close() at the very end of your session to clear all resources. 
+                //If any of your test ended abruptly causing any side-affects (not all logs sent to ExtentReports, information missing), this method will ensure that the test is still appended to the report with a warning message.
+                //You should call close() only once, at the very end (in @AfterSuite for example) as it closes the underlying stream. 
+                //Once this method is called, calling any Extent method will throw an error.
+                //close() - To close all the operation
+                extent.close();
+    }
+}
+
+
+=========================================================================================================
+
+
+extent-config.xml: 
+
+By using this external XML file (extent-config.xml), we could change the details such as Report Theme (either standard or dark), Report Title, Document Title etc.,
+
+We use extent object and use loadConfig() method to load this XML file.
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+  <configuration>
+    <!-- report theme -->
+    <!-- standard, dark -->
+    <theme>standard</theme>
+  
+    <!-- document encoding -->
+    <!-- defaults to UTF-8 -->
+    <encoding>UTF-8</encoding>
+    
+    <!-- protocol for script and stylesheets -->
+    <!-- defaults to https -->
+    <protocol>https</protocol>
+    
+    <!-- title of the document -->
+    <documentTitle>ExtentReports 2.0</documentTitle>
+    
+    <!-- report name - displayed at top-nav -->
+    <reportName></reportName>
+    
+    <!-- report headline - displayed at top-nav, after reportHeadline -->
+    <reportHeadline>Automation Report</reportHeadline>
+    
+    <!-- global date format override -->
+    <!-- defaults to yyyy-MM-dd -->
+    <dateFormat>yyyy-MM-dd</dateFormat>
+    
+    <!-- global time format override -->
+    <!-- defaults to HH:mm:ss -->
+    <timeFormat>HH:mm:ss</timeFormat>
+    
+    <!-- custom javascript -->
+    <scripts>
+      <![CDATA[
+        $(document).ready(function() {
+          
+        });
+      ]]>
+    </scripts>
+    
+    <!-- custom styles -->
+    <styles>
+      <![CDATA[
+        
+      ]]>
+    </styles>
+  </configuration>
+</extentreports>
+
+============================================================================================================
+
+                         Generate Extent Reports Version 3 in Selenium WebDriver | 
+                         Advanced Selenium Reporting
+
+
+
+By default, TestNG generates a report. A small note on how to generate reports using TestNG.
+Once you execute your tests, TestNG generates a test-output folder at the root of your project. 
+It contains Detailed report and summary report. But to get an advanced selenium report, you need to go 
+for Extent Reports. If you still, want to see how TestNG Reports look like??
+
+
+   Pre-requisites to Advanced Selenium Reporting – Generate Extent Reports:
+1.Java should be installed (Link to Install and setup Java )
+2.TestNG should be installed (Link to Install TestNG )
+3.Extent Report Version 3 Jars – Download
+4.extent-config.xml – It allows to configure HTML Report
+    Steps To Generate Extent Reports:
+1.Firstly, create a TestNG project in eclipse
+2.Now download extent library files from the following link: http://extentreports.relevantcodes.com/
+3.Add the downloaded library files in your project
+4.Create a java class say ‘ExtentReportsClass’ and add following code to it
+5.Code explanation is clearly given in the earlier post “How To Generate Extent Reports Version 2”
+
+package extentReports;
+
+import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.markuputils.ExtentColor;
+import com.aventstack.extentreports.markuputils.MarkupHelper;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import com.aventstack.extentreports.reporter.configuration.ChartLocation;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+
+
+public class ExtentReportsClassVersion3{
+	ExtentHtmlReporter htmlReporter;
+	ExtentReports extent;
+	ExtentTest logger;
+	
+	
+	@BeforeTest
+	public void startReport(){
+		
+		htmlReporter = new ExtentHtmlReporter(System.getProperty("user.dir") +"/test-output/STMExtentReport.html");
+		extent = new ExtentReports ();
+		extent.attachReporter(htmlReporter);
+		extent.setSystemInfo("Host Name", "SoftwareTestingMaterial");
+		extent.setSystemInfo("Environment", "Automation Testing");
+		extent.setSystemInfo("User Name", "Mir");
+		
+		htmlReporter.config().setDocumentTitle("Title of the Report Comes here");
+		htmlReporter.config().setReportName("Name of the Report Comes here");
+		htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
+		htmlReporter.config().setTheme(Theme.STANDARD);
+	}
+		
+	@Test
+	public void passTest(){
+		logger = extent.createTest("passTest");
+		Assert.assertTrue(true);
+		logger.log(Status.PASS, MarkupHelper.createLabel("Test Case Passed is passTest", ExtentColor.GREEN));
+	}
+	
+	@Test
+	public void failTest(){
+		logger = extent.createTest("failTest");
+		Assert.assertTrue(false);
+		logger.log(Status.PASS, "Test Case (failTest) Status is passed");
+		logger.log(Status.PASS, MarkupHelper.createLabel("Test Case (failTest) Status is passed", ExtentColor.GREEN));
+	}
+	
+	@Test
+	public void skipTest(){
+		logger = extent.createTest("skipTest");
+		throw new SkipException("Skipping - This is not ready for testing ");
+	}
+	
+	@AfterMethod
+	public void getResult(ITestResult result){
+		if(result.getStatus() == ITestResult.FAILURE){
+			//logger.log(Status.FAIL, "Test Case Failed is "+result.getName());
+			//MarkupHelper is used to display the output in different colors
+			logger.log(Status.FAIL, MarkupHelper.createLabel(result.getName() + " - Test Case Failed", ExtentColor.RED));
+			logger.log(Status.FAIL, MarkupHelper.createLabel(result.getThrowable() + " - Test Case Failed", ExtentColor.RED));
+		}else if(result.getStatus() == ITestResult.SKIP){
+			//logger.log(Status.SKIP, "Test Case Skipped is "+result.getName());
+			logger.log(Status.SKIP, MarkupHelper.createLabel(result.getName() + " - Test Case Skipped", ExtentColor.ORANGE));	
+		}
+	}
+	@AfterTest
+	public void endReport(){
+		extent.flush();
+    }
+}
+
+
+========================================================================================================
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- report theme -->
+        <!-- standard, dark -->
+        <theme>standard</theme>
+    
+        <!-- document encoding -->
+        <!-- defaults to UTF-8 -->
+        <encoding>UTF-8</encoding>
+        
+        <!-- protocol for script and stylesheets -->
+        <!-- defaults to https -->
+        <protocol>https</protocol>
+        
+        <!-- title of the document -->
+        <documentTitle>Extent</documentTitle>
+        
+        <!-- report name - displayed at top-nav -->
+        <reportName>Automation Report</reportName>
+        
+        <!-- location of charts in the test view -->
+        <!-- top, bottom -->
+        <testViewChartLocation>bottom</testViewChartLocation>
+		
+        <!-- custom javascript -->
+        <scripts>
+            <![CDATA[
+                $(document).ready(function() {
+                    
+                });
+            ]]>
+        </scripts>
+        
+        <!-- custom styles -->
+        <styles>
+            <![CDATA[
+                
+            ]]>
+        </styles>
+    </configuration>
+</extentreports>
+
+-----------------------------------------------------------------------------------------=================
+
+
+
+public class ExtentTestNGReportBuilder {
+
+	private static ExtentReports extent;
+    private static ThreadLocal parentTest = new ThreadLocal();
+    private static ThreadLocal test = new ThreadLocal();
+
+	@BeforeSuite
+	public void beforeSuite() {
+		extent = ExtentManager.createInstance("extent.html");
+		ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("extent.html");
+		extent.attachReporter(htmlReporter);
+	}
+	
+    @BeforeClass
+    public synchronized void beforeClass() {
+        ExtentTest parent = extent.createTest(getClass().getName());
+        parentTest.set(parent);
+    }
+
+    @BeforeMethod
+    public synchronized void beforeMethod(Method method) {
+        ExtentTest child = parentTest.get().createNode(method.getName());
+        test.set(child);
+    }
+
+    @AfterMethod
+    public synchronized void afterMethod(ITestResult result) {
+        if (result.getStatus() == ITestResult.FAILURE)
+            test.get().fail(result.getThrowable());
+        else if (result.getStatus() == ITestResult.SKIP)
+            test.get().skip(result.getThrowable());
+        else
+            test.get().pass("Test passed");
+
+        extent.flush();
+    }
+}
+
+public class ExtentManager {
+    
+    private static ExtentReports extent;
+    
+    public static ExtentReports getInstance() {
+    	if (extent == null)
+    		createInstance("test-output/extent.html");
+    	
+        return extent;
+    }
+    
+    public static ExtentReports createInstance(String fileName) {
+        ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(fileName);
+        htmlReporter.config().setTestViewChartLocation(ChartLocation.BOTTOM);
+        htmlReporter.config().setChartVisibilityOnOpen(true);
+        htmlReporter.config().setTheme(Theme.STANDARD);
+        htmlReporter.config().setDocumentTitle(fileName);
+        htmlReporter.config().setEncoding("utf-8");
+        htmlReporter.config().setReportName(fileName);
+        
+        extent = new ExtentReports();
+        extent.attachReporter(htmlReporter);
+        
+        return extent;
+    }
+}
+ 
+
+
+
+
+//*[@id='tsf/]/div[2]/div/div[1]/div/div[1]/input
+
+
+
+
+
+
+
+
+
+
+<img data-featherlight="./reports/Screenshots/GoogleTesting.png" width="10%" src="./reports/Screenshots/GoogleTesting.png" data-src="./reports/Screenshots/GoogleTesting.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

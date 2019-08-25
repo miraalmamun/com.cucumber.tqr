@@ -1,0 +1,121 @@
+What is BDD
+Cucumber implements BDD
+Downloading Cucumber Jars
+Preparing Features File having test scenarios
+Writing a step definition
+Writing Runner Class
+Given, When, Then, And, But annotations and usage in features class
+Passing parameters in Step Functions
+Using regular expression in step implementation to parameterize
+Parameterize complete scenario using features class
+Datatable in Cucumber and its implementation
+Running Cucumber through ANT
+Pretty, Tags and Glue
+Junit Report Generation in Cucumber
+Cucumber HTML Reports
+Log4j Usage
+Using Assertions to report failure
+
+Module#26
+Part 1/Video 1
+
+Topics covered
+What is BDD ?
+Importance of BDD
+Introduction to Cucumber
+Cucumber Eclipse Plugin
+Maven Dependencies of Cucumber
+Creating Feature file
+Given, When, Then, And, But
+Creating Scenarios
+Creating step definitions
+Annotations in Step Definitions
+
+Part 2/Video 2
+
+Topics covered
+Passing parameters from Feature files to Step Definitions
+Using Regular expressions in Cucumber Step Definitions
+Managing multiple scenarios
+Passing list to Step Definition
+Running Scenario with Multiple sets of Data
+
+
+Part 4/Video 4
+
+Topics covered
+Running from Testng Runner and testng.xml
+Running Junit Runner from Maven
+Running TestNgRunner from Maven
+Running Junit Runner from Ant
+Running TestNg Runner from Ant
+Running from BAT File
+Running Junit test parallel- Cucumber JVM Parallel Plugin
+Running TestNg tests parallel- Cucumber JVM Parallel Plugin
+
+
+====================================================================
+
+Running from Testng Runner and testng.xml
+
+We need below two dependency for Running from Testng Runner and testng.xml
+       <dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.14.3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-testng -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-testng</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+
+## If you want to run through TestNG then you need different runner
+file. Below the runner file.-->
+
+
+@CucumberOptions(
+        features = "src/test/resources/",
+        glue = {"com.qtpselenium.cucumber"},
+        tags = {"@BookAirTickets,@BookHotelTickets,@Registeration"},
+        plugin = {
+              
+                "html:target/cucumber-reports/cucumber-pretty",
+                "json:target/cucumber-reports/CucumberTestReport.json",
+                "rerun:target/cucumber-reports/rerun.txt"
+        })
+        
+public class CucumberProjectTestngRunner extends AbstractTestNGCucumberTests{
+   
+}
+
+
+It is almost same as Junit Runner file only different you need to 
+extends 'AbstractTestNGCucumberTests' with your Runner class.
+Here my runner class is "CucumberProjectTestngRunner"
+Same @CucumberOptions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
